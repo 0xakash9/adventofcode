@@ -1,42 +1,57 @@
 fn main() {
     let file = include_str!("../../input1.txt");
-    let result= part1(file);
-    println!("{:?}",result)
+    let result = part1(file);
+    println!("{:?}", result)
 }
 
+#[derive(Debug)]
+struct Part1 {
+    sum: i32,
+}
 
-fn part1(input: &str) ->Result<i32,String> {
-    let mut sum=0;
-    for line in input.lines() {
-        let  modified_line = line.to_string();
-       
-        let mut temp_str1=String::new();
-        let mut temp_str2=String::new();
-         
-        modified_line.chars().for_each(|c|{
-            if c.is_numeric(){
-               temp_str1.push(c);
-            }
-       });
+impl Part1 {
+    fn new() -> Self {
+        Part1 { sum: 0 }
+    }
+    fn extract(&mut self, str: String) {
+        let temp_str: Vec<char> = str.chars().filter(|e| e.is_numeric()).collect();
 
-       if let Some(first_char) = temp_str1.chars().nth(0){
-        temp_str2.push(first_char)
-       }
+        println!("{:?}", temp_str);
+        let temp_str2: String = temp_str[0].to_string() + &temp_str[temp_str.len() - 1].to_string();
 
-       if let Some(last_char)= temp_str1.chars().last(){
-        temp_str2.push(last_char);
-       }
-
-       match temp_str2.parse::<i32>() {
-            Ok(parsed_number) => {
-                sum+=parsed_number
-            }
+        match temp_str2.parse::<i32>() {
+            Ok(parsed_number) => self.sum += parsed_number,
             Err(_) => {
                 println!("Failed to parse the string as an integer");
             }
-      }
+        }
+    }
+}
+
+fn part1(input: &str) -> Result<i32, String> {
+    let mut _data: Part1 = Part1::new();
+    for line in input.lines() {
+        let modified_line = line.to_string();
+
+        _data.extract(modified_line);
+
+        println!("{:?}", _data);
     }
 
-    println!("{}",sum);
-    Ok(sum)
+    Ok(_data.sum)
+}
+
+#[cfg(test)]
+
+mod tests {
+
+    use super::*;
+    #[test]
+    fn test_process() {
+        let input = "1abc2
+        pqr3stu8vwx
+        a1b2c3d4e5f
+        treb7uchet";
+        assert_eq!(142, part1(input).unwrap())
+    }
 }
